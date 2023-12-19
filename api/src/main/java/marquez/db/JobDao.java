@@ -34,6 +34,7 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(JobRowMapper.class)
 @RegisterRowMapper(JobMapper.class)
@@ -91,6 +92,7 @@ public interface JobDao extends BaseDao {
   """)
   void deleteByNamespaceName(String namespaceName);
 
+  @WithSpan
   default Optional<Job> findWithDatasetsAndRun(String namespaceName, String jobName) {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
@@ -192,6 +194,7 @@ public interface JobDao extends BaseDao {
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
+  @WithSpan
   default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
     RunDao runDao = createRunDao();
     return findAll(namespaceName, limit, offset).stream()
@@ -203,6 +206,7 @@ public interface JobDao extends BaseDao {
         .collect(Collectors.toList());
   }
 
+  @WithSpan
   default void setJobData(List<JobDataset> datasets, Job j) {
     Optional.of(
             datasets.stream()
@@ -225,6 +229,7 @@ public interface JobDao extends BaseDao {
         .ifPresent(s -> j.setOutputs(s));
   }
 
+  @WithSpan
   default void setJobData(Run run, Job j) {
     j.setLatestRun(run);
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
@@ -246,11 +251,13 @@ public interface JobDao extends BaseDao {
             .collect(Collectors.toSet()));
   }
 
+  @WithSpan
   default JobRow upsertJobMeta(
       NamespaceName namespaceName, JobName jobName, JobMeta jobMeta, ObjectMapper mapper) {
     return upsertJobMeta(namespaceName, jobName, null, jobMeta, mapper);
   }
 
+  @WithSpan
   default JobRow upsertJobMeta(
       NamespaceName namespaceName,
       JobName jobName,
@@ -275,6 +282,7 @@ public interface JobDao extends BaseDao {
         toJson(jobMeta.getInputs(), mapper));
   }
 
+  @WithSpan
   default String toUrlString(URL url) {
     if (url == null) {
       return null;
@@ -282,6 +290,7 @@ public interface JobDao extends BaseDao {
     return url.toString();
   }
 
+  @WithSpan
   default PGobject toJson(Set<DatasetId> dataset, ObjectMapper mapper) {
     try {
       PGobject jsonObject = new PGobject();

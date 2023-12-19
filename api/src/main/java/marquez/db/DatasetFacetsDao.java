@@ -19,6 +19,7 @@ import marquez.service.models.LineageEvent;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 /** The DAO for {@code dataset} facets. */
 public interface DatasetFacetsDao {
@@ -124,6 +125,7 @@ public interface DatasetFacetsDao {
    * @param datasetFacets
    */
   @Transaction
+  @WithSpan
   default void insertDatasetFacetsFor(
       @NonNull UUID datasetUuid,
       @NonNull UUID datasetVersionUuid,
@@ -150,6 +152,7 @@ public interface DatasetFacetsDao {
                     FacetUtils.toPgObject(fieldName, jsonNode.get(fieldName))));
   }
 
+  @WithSpan
   default void insertInputDatasetFacetsFor(
       @NonNull UUID datasetUuid,
       @NonNull UUID datasetVersionUuid,
@@ -176,6 +179,7 @@ public interface DatasetFacetsDao {
                     FacetUtils.toPgObject(fieldName, jsonNode.get(fieldName))));
   }
 
+  @WithSpan
   default void insertOutputDatasetFacetsFor(
       @NonNull UUID datasetUuid,
       @NonNull UUID datasetVersionUuid,

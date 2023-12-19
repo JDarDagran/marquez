@@ -15,25 +15,30 @@ import marquez.db.mappers.SearchResultMapper;
 import org.jdbi.v3.sqlobject.SqlObject;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 /** The DAO for {@link SearchResult}. */
 @RegisterRowMapper(SearchResultMapper.class)
 public interface SearchDao extends SqlObject {
 
+  @WithSpan
   default List<SearchResult> search(String query, SearchFilter filter, SearchSort sort, int limit) {
     return search(query, filter, sort, limit, null, null, null);
   }
 
+  @WithSpan
   default List<SearchResult> search(
       String query, SearchFilter filter, SearchSort sort, int limit, String namespace) {
     return search(query, filter, sort, limit, namespace, null, null);
   }
 
+  @WithSpan
   default List<SearchResult> search(
       String query, SearchFilter filter, SearchSort sort, int limit, LocalDate before) {
     return search(query, filter, sort, limit, null, before, null);
   }
 
+  @WithSpan
   default List<SearchResult> search(
       String query,
       SearchFilter filter,

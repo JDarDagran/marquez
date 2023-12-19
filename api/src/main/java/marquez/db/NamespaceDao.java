@@ -22,6 +22,7 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(NamespaceRowMapper.class)
 @RegisterRowMapper(NamespaceMapper.class)
@@ -29,6 +30,7 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 public interface NamespaceDao extends BaseDao {
 
   @Transaction
+  @WithSpan
   default Namespace upsertNamespaceMeta(
       @NonNull NamespaceName namespaceName, @NonNull NamespaceMeta meta) {
     Instant now = Instant.now();
@@ -88,6 +90,7 @@ public interface NamespaceDao extends BaseDao {
   @SqlUpdate("UPDATE namespaces SET is_hidden=true WHERE name = :name")
   void delete(String name);
 
+  @WithSpan
   default NamespaceRow upsertNamespaceRow(
       UUID uuid, Instant now, String name, String currentOwnerName) {
     doUpsertNamespaceRow(uuid, now, name, currentOwnerName);

@@ -19,6 +19,7 @@ import marquez.service.models.SourceMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(SourceRowMapper.class)
 @RegisterRowMapper(SourceMapper.class)
@@ -81,6 +82,7 @@ public interface SourceDao {
       UUID uuid, String type, Instant now, String name, String connectionUrl, String description);
 
   @Transaction
+  @WithSpan
   default Source upsert(@NonNull SourceName name, @NonNull SourceMeta meta) {
     Instant now = Instant.now();
     upsert(

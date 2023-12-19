@@ -49,6 +49,7 @@ usage() {
   echo "  -d, --detach          run in the background"
   echo "  --no-web              don't start the web UI"
   echo "  --no-volumes          don't create volumes"
+  echo "  --grafana             create Grafana containers"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -66,6 +67,7 @@ API_ADMIN_PORT=5001
 WEB_PORT=3000
 NO_WEB="false"
 NO_VOLUMES="false"
+GRAFANA="false"
 TAG="${VERSION}"
 BUILD="false"
 ARGS="-V --force-recreate --remove-orphans"
@@ -102,6 +104,7 @@ while [ $# -gt 0 ]; do
     -d|'--detach') DETACH='true' ;;
     --no-web) NO_WEB='true' ;;
     --no-volumes) NO_VOLUMES='true' ;;
+    --grafana) GRAFANA='true' ;;
     -h|'--help')
        usage
        exit 0
@@ -139,6 +142,12 @@ fi
 # Create docker volumes for Marquez
 if [[ "${NO_VOLUMES}" = "false" ]]; then
   ./docker/volumes.sh marquez
+fi
+
+# Create Grafana containers
+if [[ "${BUILD}" = "true" ]]; then
+  compose_files+=" -f docker-compose.grafana.yml"
+  ARGS+=" --build"
 fi
 
 # Run docker compose cmd with overrides

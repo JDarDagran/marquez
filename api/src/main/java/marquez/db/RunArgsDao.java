@@ -13,9 +13,11 @@ import marquez.db.models.RunArgsRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(RunArgsRowMapper.class)
 public interface RunArgsDao {
+  @WithSpan
   default RunArgsRow upsertRunArgs(UUID uuid, Instant now, String args, String checksum) {
     doUpsertRunArgs(uuid, now, args, checksum);
     return findRunArgsByChecksum(checksum).orElseThrow();

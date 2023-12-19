@@ -39,6 +39,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(DatasetVersionRowMapper.class)
 @RegisterRowMapper(ExtendedDatasetVersionRowMapper.class)
@@ -46,6 +47,7 @@ import org.postgresql.util.PGobject;
 public interface DatasetVersionDao extends BaseDao {
 
   @Transaction
+  @WithSpan
   default DatasetVersionRow upsertDatasetVersion(
       UUID datasetUuid,
       Instant now,
@@ -110,6 +112,7 @@ public interface DatasetVersionDao extends BaseDao {
     return datasetVersionRow;
   }
 
+  @WithSpan
   default PGobject toPgObjectFields(List<Field> fields) {
     if (fields == null) {
       return null;
@@ -124,10 +127,12 @@ public interface DatasetVersionDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default PGobject toPgObjectSchemaFields(List<SchemaField> fields) {
     return toPgObjectFields(toFields(fields));
   }
 
+  @WithSpan
   default List<Field> toFields(List<SchemaField> fields) {
     if (fields == null) {
       return null;
@@ -141,6 +146,7 @@ public interface DatasetVersionDao extends BaseDao {
         .collect(Collectors.toList());
   }
 
+  @WithSpan
   default void updateDatasetVersionMetric(
       String namespaceName,
       String type,
@@ -216,6 +222,7 @@ public interface DatasetVersionDao extends BaseDao {
       ) f ON f.dataset_uuid = dv.uuid""")
   Optional<DatasetVersion> findByUuid(UUID uuid);
 
+  @WithSpan
   default Optional<DatasetVersion> findByWithRun(UUID version) {
     Optional<DatasetVersion> v = findBy(version);
 
@@ -283,6 +290,7 @@ public interface DatasetVersionDao extends BaseDao {
   """)
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 
+  @WithSpan
   default List<DatasetVersion> findAllWithRun(
       String namespaceName, String datasetName, int limit, int offset) {
     List<DatasetVersion> v = findAll(namespaceName, datasetName, limit, offset);

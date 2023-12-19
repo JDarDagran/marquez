@@ -14,6 +14,7 @@ import marquez.db.models.TagRow;
 import marquez.service.models.Tag;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(TagRowMapper.class)
 @RegisterRowMapper(TagMapper.class)
@@ -34,6 +35,7 @@ public interface TagDao {
           + "RETURNING *")
   TagRow upsert(UUID uuid, Instant updatedAt, String name, String description);
 
+  @WithSpan
   default Tag upsert(Tag tag) {
     Instant now = Instant.now();
     if (tag.getDescription().isPresent()) {

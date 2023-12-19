@@ -43,6 +43,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 /** The DAO for {@code JobVersion}. */
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
@@ -240,6 +241,7 @@ public interface JobVersionDao extends BaseDao {
    * @param inputDatasetUuid The unique ID of the input dataset.
    * @param jobUuid The unique ID of the job.
    */
+  @WithSpan
   default void upsertInputDatasetFor(
       UUID jobVersionUuid, UUID inputDatasetUuid, UUID jobUuid, UUID symlinkTargetJobUuid) {
     markInputOrOutputDatasetAsPreviousFor(jobVersionUuid, jobUuid, IoType.INPUT);
@@ -253,6 +255,7 @@ public interface JobVersionDao extends BaseDao {
    * @param outputDatasetUuid The unique ID of the output dataset.
    * @param jobUuid The unique ID of the job.
    */
+  @WithSpan
   default void upsertOutputDatasetFor(
       UUID jobVersionUuid, UUID outputDatasetUuid, UUID jobUuid, UUID symlinkTargetJobUuid) {
     markInputOrOutputDatasetAsPreviousFor(jobVersionUuid, jobUuid, IoType.OUTPUT);
@@ -266,6 +269,7 @@ public interface JobVersionDao extends BaseDao {
    * @param jobVersionUuid The unique ID of the job version.
    * @return The input datasets for the job version.
    */
+  @WithSpan
   default List<UUID> findInputDatasetsFor(UUID jobVersionUuid) {
     return findInputOrOutputDatasetsFor(jobVersionUuid, IoType.INPUT);
   }
@@ -276,6 +280,7 @@ public interface JobVersionDao extends BaseDao {
    * @param jobVersionUuid The unique ID of the job version.
    * @return The output datasets for the job version.
    */
+  @WithSpan
   default List<UUID> findOutputDatasetsFor(UUID jobVersionUuid) {
     return findInputOrOutputDatasetsFor(jobVersionUuid, IoType.OUTPUT);
   }
@@ -367,6 +372,7 @@ public interface JobVersionDao extends BaseDao {
    * @param jobRow The job.
    * @return A {@link BagOfJobVersionInfo} object.
    */
+  @WithSpan
   default BagOfJobVersionInfo upsertRunlessJobVersion(
       @NonNull JobRow jobRow, List<DatasetRecord> inputs, List<DatasetRecord> outputs) {
     // Get the job.
@@ -460,6 +466,7 @@ public interface JobVersionDao extends BaseDao {
    * @param transitionedAt The timestamp of the run state transition.
    * @return A {@link BagOfJobVersionInfo} object.
    */
+  @WithSpan
   default BagOfJobVersionInfo upsertJobVersionOnRunTransition(
       @NonNull JobRowRunDetails jobRowRunDetails,
       @NonNull RunState runState,
@@ -525,6 +532,7 @@ public interface JobVersionDao extends BaseDao {
   }
 
   /** Returns the specified {@link ExtendedDatasetVersionRow}s as {@link DatasetId}s. */
+  @WithSpan
   default ImmutableSortedSet<DatasetId> toDatasetIds(
       @NonNull final List<DatasetVersionRow> datasetVersionRows) {
     final ImmutableSortedSet.Builder<DatasetId> datasetIds = ImmutableSortedSet.naturalOrder();
@@ -539,6 +547,7 @@ public interface JobVersionDao extends BaseDao {
         NamespaceName.of(dataset.getNamespaceName()), DatasetName.of(dataset.getDatasetName()));
   }
 
+  @WithSpan
   default JobRowRunDetails loadJobRowRunDetails(JobRow jobRow, UUID runUuid) {
     // Get the inputs and outputs dataset versions for the run associated with the job version.
     final DatasetVersionDao datasetVersionDao = createDatasetVersionDao();

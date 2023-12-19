@@ -23,11 +23,13 @@ import org.jdbi.v3.sqlobject.customizer.BindBeanList;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(ColumnLineageRowMapper.class)
 @RegisterRowMapper(ColumnLineageNodeDataMapper.class)
 public interface ColumnLineageDao extends BaseDao {
-
+  
+  @WithSpan
   default List<ColumnLineageRow> upsertColumnLineageRow(
       UUID outputDatasetVersionUuid,
       UUID outputDatasetFieldUuid,

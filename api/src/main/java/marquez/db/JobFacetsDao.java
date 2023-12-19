@@ -22,6 +22,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(JobFacetsMapper.class)
 /** The DAO for {@code job} facets. */
@@ -97,6 +98,7 @@ public interface JobFacetsDao {
   JobFacets findJobFacetsByRunUuid(UUID runUuid);
 
   @Transaction
+  @WithSpan
   default void insertJobFacetsFor(
       @NonNull UUID jobUuid,
       @NonNull UUID jobVersionUuid,
@@ -119,6 +121,7 @@ public interface JobFacetsDao {
   }
 
   @Transaction
+  @WithSpan
   default void insertJobFacetsFor(
       @NonNull UUID jobUuid,
       @Nullable UUID runUuid,

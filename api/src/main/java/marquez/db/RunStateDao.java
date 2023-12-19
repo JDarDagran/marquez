@@ -17,6 +17,7 @@ import marquez.db.models.RunStateRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(RunStateRowMapper.class)
 public interface RunStateDao extends BaseDao {
@@ -26,6 +27,7 @@ public interface RunStateDao extends BaseDao {
   RunStateRow upsert(UUID uuid, Instant now, UUID runUuid, RunState runStateType);
 
   @Transaction
+  @WithSpan
   default void updateRunStateFor(UUID runUuid, RunState runState, Instant transitionedAt) {
     RunDao runDao = createRunDao();
     RunStateRow runStateRow = upsert(UUID.randomUUID(), transitionedAt, runUuid, runState);

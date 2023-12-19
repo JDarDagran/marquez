@@ -41,6 +41,7 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(ExtendedRunRowMapper.class)
 @RegisterRowMapper(RunRowMapper.class)
@@ -332,6 +333,7 @@ public interface RunDao extends BaseDao {
       String jobName,
       String location);
 
+  @WithSpan
   default RunRow upsert(RunUpsert runUpsert) {
     if (runUpsert.runStateType == null) {
       return upsert(
@@ -372,6 +374,7 @@ public interface RunDao extends BaseDao {
   void updateInputMapping(UUID runUuid, UUID datasetVersionUuid);
 
   @Transaction
+  @WithSpan
   default void notifyJobChange(UUID runUuid, JobRow jobRow, JobMeta jobMeta) {
     upsertRun(runUuid, jobRow.getName(), jobRow.getNamespaceName());
 
@@ -380,6 +383,7 @@ public interface RunDao extends BaseDao {
     upsertOutputDatasetsFor(runUuid, jobMeta.getOutputs());
   }
 
+  @WithSpan
   default void upsertOutputDatasetsFor(UUID runUuid, ImmutableSet<DatasetId> runOutputIds) {
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     DatasetDao datasetDao = createDatasetDao();
@@ -420,6 +424,7 @@ public interface RunDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default List<SchemaField> toSchemaFields(List<Field> fields) {
     if (fields == null) {
       return null;
@@ -435,6 +440,7 @@ public interface RunDao extends BaseDao {
         .collect(Collectors.toList());
   }
 
+  @WithSpan
   default void updateInputDatasetMapping(Set<DatasetId> inputs, UUID runUuid) {
     if (inputs == null) {
       return;
@@ -459,6 +465,7 @@ public interface RunDao extends BaseDao {
 
   /** Insert from run creates a run but does not associate any datasets. */
   @Transaction
+  @WithSpan
   default RunRow upsertRunMeta(
       NamespaceName namespaceName, JobRow jobRow, RunMeta runMeta, RunState currentState) {
     Instant now = Instant.now();

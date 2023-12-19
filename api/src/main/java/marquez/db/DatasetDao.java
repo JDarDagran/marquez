@@ -38,6 +38,7 @@ import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(DatasetRowMapper.class)
 @RegisterRowMapper(DatasetMapper.class)
@@ -95,12 +96,14 @@ public interface DatasetDao extends BaseDao {
       """)
   Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
+  @WithSpan
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
     Optional<Dataset> dataset = findDatasetByName(namespaceName, datasetName);
     dataset.ifPresent(this::setFields);
     return dataset;
   }
 
+  @WithSpan
   default void setFields(Dataset ds) {
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
@@ -153,6 +156,7 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery("SELECT count(*) FROM datasets_view AS j WHERE j.namespace_name = :namespaceName")
   int countFor(String namespaceName);
 
+  @WithSpan
   default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
     List<Dataset> datasets = findAll(namespaceName, limit, offset);
     return datasets.stream().peek(this::setFields).collect(Collectors.toList());
@@ -300,6 +304,7 @@ public interface DatasetDao extends BaseDao {
   void deleteDatasetTag(String namespaceName, String datasetName, String tagName);
 
   @Transaction
+  @WithSpan
   default Dataset upsertDatasetMeta(
       NamespaceName namespaceName, DatasetName datasetName, DatasetMeta datasetMeta) {
     Instant now = Instant.now();
@@ -373,10 +378,12 @@ public interface DatasetDao extends BaseDao {
     return findWithTags(namespaceName.getValue(), datasetName.getValue()).get();
   }
 
+  @WithSpan
   default String toDefaultSourceType(DatasetType type) {
     return "POSTGRES";
   }
 
+  @WithSpan
   default void updateDatasetMetric(
       NamespaceName namespaceName,
       DatasetType datasetType,
@@ -387,6 +394,7 @@ public interface DatasetDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default Dataset updateTags(String namespaceName, String datasetName, String tagName) {
     Instant now = Instant.now();
     DatasetRow datasetRow = findDatasetAsRow(namespaceName, datasetName).get();

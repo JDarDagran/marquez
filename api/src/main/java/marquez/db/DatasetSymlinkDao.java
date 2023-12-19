@@ -13,10 +13,12 @@ import marquez.db.models.DatasetSymlinkRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(DatasetSymlinksRowMapper.class)
 public interface DatasetSymlinkDao extends BaseDao {
 
+  @WithSpan
   default DatasetSymlinkRow upsertDatasetSymlinkRow(
       UUID uuid, String name, UUID namespaceUuid, boolean isPrimary, String type, Instant now) {
     doUpsertDatasetSymlinkRow(uuid, name, namespaceUuid, isPrimary, type, now);

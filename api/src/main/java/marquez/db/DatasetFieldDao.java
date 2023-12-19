@@ -30,6 +30,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(DatasetFieldRowMapper.class)
 @RegisterRowMapper(DatasetFieldMapper.class)
@@ -47,6 +48,7 @@ public interface DatasetFieldDao extends BaseDao {
       """)
   boolean exists(String namespaceName, String datasetName, String name);
 
+  @WithSpan
   default Dataset updateTags(
       String namespaceName, String datasetName, String fieldName, String tagName) {
     Instant now = Instant.now();

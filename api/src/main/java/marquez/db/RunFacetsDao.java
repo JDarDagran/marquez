@@ -23,6 +23,7 @@ import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(RunFacetsMapper.class)
 /** The DAO for {@code run} facets. */
@@ -92,6 +93,7 @@ public interface RunFacetsDao {
    * @param runFacet
    */
   @Transaction
+  @WithSpan
   default void insertRunFacetsFor(
       @NonNull UUID runUuid,
       @NonNull Instant lineageEventTime,

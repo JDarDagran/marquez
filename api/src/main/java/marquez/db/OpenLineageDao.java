@@ -74,6 +74,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 @RegisterRowMapper(LineageEventMapper.class)
 public interface OpenLineageDao extends BaseDao {
@@ -163,6 +164,7 @@ public interface OpenLineageDao extends BaseDao {
       AND le.event_time >= :after)""")
   int getAllLineageTotalCount(ZonedDateTime before, ZonedDateTime after);
 
+  @WithSpan
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
     RunState runState = getRunState(event.getEventType());
@@ -176,6 +178,7 @@ public interface OpenLineageDao extends BaseDao {
     return updateLineageRow;
   }
 
+  @WithSpan
   default UpdateLineageRow updateMarquezModel(DatasetEvent event, ObjectMapper mapper) {
     ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
@@ -208,6 +211,7 @@ public interface OpenLineageDao extends BaseDao {
     return bag;
   }
 
+  @WithSpan
   default UpdateLineageRow updateMarquezModel(JobEvent event, ObjectMapper mapper) {
     ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
@@ -282,6 +286,7 @@ public interface OpenLineageDao extends BaseDao {
     return bag;
   }
 
+  @WithSpan
   default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
     ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
@@ -733,6 +738,7 @@ public interface OpenLineageDao extends BaseDao {
     return newParentJobRow;
   }
 
+  @WithSpan
   default Set<DatasetId> toDatasetId(List<Dataset> datasets) {
     Set<DatasetId> set = new HashSet<>();
     if (datasets == null) {
@@ -746,6 +752,7 @@ public interface OpenLineageDao extends BaseDao {
     return set;
   }
 
+  @WithSpan
   default void updateMarquezOnComplete(
       LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
     final JobVersionDao jobVersionDao = createJobVersionDao();
@@ -784,6 +791,7 @@ public interface OpenLineageDao extends BaseDao {
    * @param updateLineageRow
    * @param runState
    */
+  @WithSpan
   default void updateMarquezOnStreamingJob(
       LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
     final JobVersionDao jobVersionDao = createJobVersionDao();
@@ -800,6 +808,7 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default String getUrlOrNull(String uri) {
     try {
       return new URI(uri).toASCIIString();
@@ -813,10 +822,12 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default String formatNamespaceName(String namespace) {
     return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.@+]", "_");
   }
 
+  @WithSpan
   default DatasetRecord upsertLineageDataset(
       ModelDaos daos, Dataset ds, Instant now, UUID runUuid, boolean isInput) {
     daos.initBaseDao(this);
@@ -1063,18 +1074,22 @@ public interface OpenLineageDao extends BaseDao {
         .collect(Collectors.toList());
   }
 
+  @WithSpan
   default String formatDatasetName(String name) {
     return name;
   }
 
+  @WithSpan
   default String getSourceType(Dataset ds) {
     return SourceType.of("POSTGRESQL").getValue();
   }
 
+  @WithSpan
   default DatasetType getDatasetType(Dataset ds) {
     return DatasetType.DB_TABLE;
   }
 
+  @WithSpan
   default RunState getRunState(String eventType) {
     if (eventType == null) {
       return RunState.RUNNING;
@@ -1093,6 +1108,7 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default Map<String, String> createRunArgs(LineageEvent event) {
     Map<String, String> args = new LinkedHashMap<>();
     if (event.getRun().getFacets() != null) {
@@ -1115,6 +1131,7 @@ public interface OpenLineageDao extends BaseDao {
     return args;
   }
 
+  @WithSpan
   default UUID runToUuid(String runId) {
     try {
       return UUID.fromString(runId);
@@ -1124,6 +1141,7 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
+  @WithSpan
   default PGobject createJsonArray(BaseEvent event, ObjectMapper mapper) {
     try {
       PGobject jsonObject = new PGobject();
